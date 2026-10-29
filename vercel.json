@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "multicultural-welfare-service",
   "cleanUrls": true,
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }

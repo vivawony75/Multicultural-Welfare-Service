@@ -841,42 +841,9 @@
           document.getElementById("regPassword").focus();
           return;
         }
-        if (languageChecks.length === 0 && !languageOtherText) {
-          showToast("사용하는 언어를 최소 1개 이상 체크하거나 기타 언어를 입력해 주세요.", "error");
-          return;
-        }
-        if (languageChecks.includes("기타") && !languageOtherText) {
-          showToast("사용 언어 '기타'를 선택하셨습니다. 기타 언어를 직접 입력해 주세요.", "error");
-          document.getElementById("languageOtherInput").focus();
-          return;
-        }
-        if (!nationality) {
-          showToast("국적을 입력해 주세요.", "error");
-          return;
-        }
-        if (koreanLevel.length === 0) {
-          showToast("한국어 사용 가능 여부를 최소 1개 이상 체크해 주세요.", "error");
-          return;
-        }
-        if (!visaText && visaChecks.length === 0) {
-          showToast("체류자격을 입력하거나 '미등록' 또는 '체류자격 상실'을 체크해 주세요.", "error");
-          return;
-        }
-        if (religionChecks.length === 0) {
-          showToast("종교 항목을 체크해 주세요.", "error");
-          return;
-        }
-        if (regionChecks.length === 0 && !regionOtherText) {
-          showToast("거주 지역(부산, 김해, 양산, 기타)을 체크해 주세요.", "error");
-          return;
-        }
-        if (regionChecks.includes("기타") && !regionOtherText) {
-          showToast("거주 지역 '기타'를 선택하셨습니다. 상세 지역을 직접 입력해 주세요.", "error");
-          document.getElementById("regionOtherInput").focus();
-          return;
-        }
-        if (!phone || !age || !job || !family) {
-          showToast("연락처, 나이, 직업, 가족(동거인) 항목을 모두 입력해 주세요.", "error");
+        if (!phone) {
+          showToast("연락처를 입력해 주세요.", "error");
+          document.getElementById("regPhone").focus();
           return;
         }
 
@@ -894,7 +861,7 @@
           finalRegions.push(`기타(${regionOtherText})`);
         }
 
-        const finalVisaStatus = [visaText, ...visaChecks].filter(Boolean).join(" / ");
+        const finalVisaStatus = [visaText, ...visaChecks].filter(Boolean).join(" / ") || "-";
         const finalReligion = religionChecks.map((r) =>
           r === "기타" && religionOtherText ? `기타(${religionOtherText})` : r
         );
@@ -904,16 +871,16 @@
           userId,
           userName,
           password,
-          language: finalLanguages,
-          nationality,
-          koreanLevel,
+          language: finalLanguages.length > 0 ? finalLanguages : ["-"],
+          nationality: nationality || "-",
+          koreanLevel: koreanLevel.length > 0 ? koreanLevel : ["-"],
           visaStatus: finalVisaStatus,
-          religion: finalReligion,
+          religion: finalReligion.length > 0 ? finalReligion : ["-"],
           phone,
-          region: finalRegions,
-          age,
-          job,
-          family,
+          region: finalRegions.length > 0 ? finalRegions : ["-"],
+          age: age || "-",
+          job: job || "-",
+          family: family || "-",
           role: "member",
           createdAt: formatDateTime()
         };

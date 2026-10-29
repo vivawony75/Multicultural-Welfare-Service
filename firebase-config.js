@@ -1,14 +1,14 @@
-/**
+﻿/**
  * Firebase 연동 설정 및 데이터 동기화 모듈 (Firestore + LocalStorage + 메모리 안전 폴백 지원)
  */
 
 const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyDQ7x3xoRBMQV7lUQhRKBEvvxCLkKY0CHA",
+  authDomain: "mwservice-c8b1c.firebaseapp.com",
+  projectId: "mwservice-c8b1c",
+  storageBucket: "mwservice-c8b1c.firebasestorage.app",
+  messagingSenderId: "464645380405",
+  appId: "1:464645380405:web:244860e6f0fb0e40fed47c"
 };
 
 const STORAGE_KEYS = {
