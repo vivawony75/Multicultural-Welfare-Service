@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>다문화 복지 브릿지 | 복지 서비스 통합 신청 플랫폼</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- 상단 고정 네비게이션 바 (윈도형 화면 전환 구성) -->
+  <header class="site-header" id="top">
+    <div class="container header-inner">
+      <button type="button" class="brand-logo" data-window-target="about">
+        <span class="brand-emblem">🤝</span>
+        <div class="brand-text">
+          <span class="brand-title">다문화 복지 브릿지</span>
+          <span class="brand-sub">Multicultural Welfare Service</span>
+        </div>
+      </button>
+
+      <!-- 상단 핵심 메뉴: [사이트 안내], [서비스 신청], [관리자 메뉴], [회원가입] -->
+      <nav class="main-nav" aria-label="주요 메뉴">
+        <button type="button" class="nav-link active" data-window-target="about">
+          사이트 안내
+        </button>
+        <button type="button" class="nav-link" data-window-target="apply">
+          서비스 신청
+          <span class="nav-badge" id="navApplyBadge">회원전용</span>
+        </button>
+        <button type="button" class="nav-link" data-window-target="admin">
+          관리자 메뉴
+          <span class="nav-badge admin-badge" id="navAdminBadge">관리자</span>
+        </button>
+        <button type="button" class="nav-link" data-window-target="register">
+          회원가입
+        </button>
+      </nav>
+
+      <!-- 우측 로그인/계정 상태 영역 -->
+      <div class="auth-bar">
+        <div id="userStatusDisplay" class="user-status hidden">
+          <span class="status-dot"></span>
+          <span id="currentUserText" class="user-name">게스트</span>
+          <button type="button" id="logoutBtn" class="btn btn-outline btn-sm">로그아웃</button>
+        </div>
+        <button type="button" id="openLoginModalBtn" class="btn btn-primary btn-sm">로그인</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 윈도형(Window-type) 컨테이너 -->
+  <main class="workspace-shell">
+    <div class="container">
+      <!-- 윈도 프레임 상단 타이틀 바 -->
+      <div class="app-window-frame">
+        <div class="window-titlebar">
+          <div class="window-dots" aria-hidden="true">
+            <span class="win-dot red"></span>
+            <span class="win-dot yellow"></span>
+            <span class="win-dot green"></span>
+          </div>
+          <div class="window-current-title" id="windowCurrentTitle">
+            🪟 사이트 안내 (전체 공개)
+          </div>
+          <div class="window-status-right">
+            <span class="db-status-badge" id="dbStatusBadge" title="데이터베이스 연동 상태">로컬 저장소 연동됨</span>
+          </div>
+        </div>
+
+        <!-- 윈도 내부 바디 (선택된 메뉴의 창만 단독 표시) -->
+        <div class="window-body">
+
+          <!-- 1. [사이트 안내] 윈도 화면 (로그인 없이 모두에게 공개) -->
+          <section id="window-about" class="window-pane active-pane" role="tabpanel">
+            <div class="hero-card">
+              <div class="hero-content">
+                <p class="hero-eyebrow">WELCOME · 다문화 가족 및 외국인 주민 맞춤형 복지 지원</p>
+                <h1 class="hero-greeting">안녕하세요?</h1>
+                <div class="hero-notice-box">
+                  <p class="notice-placeholder">
+                    (상세 내용은 제작 후에 다시 수정해서 업로드)
+                  </p>
+                  <p class="notice-subtext">
+                    본 웹 앱은 복지 서비스를 필요로 하는 다문화 대상자분들이 <strong>한국어 교육, 의료 지원, 법률·심리 상담 및 기타 맞춤형 복지 지원</strong>을 쉽고 편리하게 신청하실 수 있도록 제작된 통합 복지 지원 플랫폼입니다.
+                  </p>
+                </div>
+
+                <div class="hero-actions">
+                  <button type="button" class="btn btn-primary btn-lg" data-window-target="register">회원가입 창 열기</button>
+                  <button type="button" class="btn btn-secondary btn-lg" data-window-target="apply">서비스 신청 창 열기</button>
+                  <button type="button" id="quickLoginHeroBtn" class="btn btn-ghost btn-lg">기존 회원 / 관리자 로그인</button>
+                </div>
+              </div>
+
+              <div class="hero-visual">
+                <div class="feature-preview-grid">
+                  <div class="preview-card">
+                    <span class="preview-icon">📚</span>
+                    <h3>한국어 교육 지원</h3>
+                    <p>초급 · 중급 · 고급 수준별 맞춤형 한국어 교육 과정 지원</p>
+                  </div>
+                  <div class="preview-card">
+                    <span class="preview-icon">🏥</span>
+                    <h3>의료 지원 서비스</h3>
+                    <p>진료 연계, 건강 검진 및 의료비·통역 지원 서비스</p>
+                  </div>
+                  <div class="preview-card">
+                    <span class="preview-icon">⚖️</span>
+                    <h3>법률 및 심리 상담</h3>
+                    <p>체류·노동·가사 법률 상담 및 전문 심리 치유 상담</p>
+                  </div>
+                  <div class="preview-card">
+                    <span class="preview-icon">🌏</span>
+                    <h3>맞춤형 기타 지원</h3>
+                    <p>생활 정착, 통번역 등 필요한 복지 서비스 자유 신청</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 이용 안내 프로세스 -->
+            <div class="process-strip">
+              <div class="process-step">
+                <span class="step-num">STEP 01</span>
+                <strong>회원가입 및 정보 등록</strong>
+                <p>사용 언어, 국적, 거주 지역, 체류자격 등 기본 현황을 입력하여 가입합니다.</p>
+              </div>
+              <div class="process-step">
+                <span class="step-num">STEP 02</span>
+                <strong>복지 서비스 중복 체크 신청</strong>
+                <p>상단 [서비스 신청] 메뉴 창에서 교육, 의료, 법률·심리 상담을 중복 선택해 신청합니다.</p>
+              </div>
+              <div class="process-step">
+                <span class="step-num">STEP 03</span>
+                <strong>관리자 확인 및 맞춤 연계</strong>
+                <p>관리자가 신청서를 확인하여 희망 날짜에 맞춰 안내해 드립니다.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. [서비스 신청] 윈도 화면 (회원 가입한 사람들에게만 공개) -->
+          <section id="window-apply" class="window-pane hidden" role="tabpanel">
+            <div class="section-header">
+              <span class="pill-tag">서비스 신청 (회원 전용 윈도)</span>
+              <h2 class="section-title">맞춤형 복지 서비스 신청</h2>
+              <p class="section-desc">필요하신 복지 지원 항목을 모두 체크(중복 선택 가능)하신 후 희망 날짜와 남기실 말씀을 작성해 주세요.</p>
+            </div>
+
+            <!-- 비로그인 시 표시되는 잠금 화면 -->
+            <div id="applyLockedView" class="locked-card">
+              <div class="locked-icon">🔒</div>
+              <h3>회원 가입한 분들에게만 공개되는 메뉴입니다</h3>
+              <p>복지 서비스 신청은 회원가입 및 로그인 후 이용하실 수 있습니다.<br/>아직 회원이 아니시라면 회원가입 메뉴에서 간편하게 가입해 주세요.</p>
+              <div class="locked-actions">
+                <button type="button" class="btn btn-primary" data-open-login="member">로그인하기</button>
+                <button type="button" class="btn btn-outline" data-window-target="register">회원가입 창으로 이동</button>
+              </div>
+            </div>
+
+            <!-- 로그인(회원/관리자) 시 표시되는 서비스 신청 폼 -->
+            <div id="applyAuthorizedView" class="card form-card hidden">
+              <div class="applicant-banner" id="applicantBanner">
+                <div>
+                  <span class="banner-label">신청 회원 정보</span>
+                  <strong id="applicantInfoText">-</strong>
+                </div>
+                <span class="badge-success">✓ 복수(중복) 체크 가능</span>
+              </div>
+
+              <form id="serviceApplyForm" novalidate>
+                <!-- 1. 한국어 교육 -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">📘</span>
+                    <div>
+                      <h3>1. 한국어 교육</h3>
+                      <p>희망하시는 한국어 교육 과정을 선택해 주세요 (중복 체크 가능)</p>
+                    </div>
+                  </div>
+                  <div class="checkbox-grid">
+                    <label class="check-card">
+                      <input type="checkbox" name="koreanEdu" value="초급" />
+                      <span class="check-box-ui"></span>
+                      <span class="check-label">
+                        <strong>초급 과정</strong>
+                        <small>한글 자모음 및 기초 생활 회화</small>
+                      </span>
+                    </label>
+                    <label class="check-card">
+                      <input type="checkbox" name="koreanEdu" value="중급" />
+                      <span class="check-box-ui"></span>
+                      <span class="check-label">
+                        <strong>중급 과정</strong>
+                        <small>일상 의사소통 및 사회문화 이해</small>
+                      </span>
+                    </label>
+                    <label class="check-card">
+                      <input type="checkbox" name="koreanEdu" value="고급" />
+                      <span class="check-box-ui"></span>
+                      <span class="check-label">
+                        <strong>고급 과정</strong>
+                        <small>직무·학업 한국어 및 심화 표현</small>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 2. 의료 지원 -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">🏥</span>
+                    <div>
+                      <h3>2. 의료 지원</h3>
+                      <p>병원 진료 연계, 통역, 기초 의료 지원이 필요한 경우 체크해 주세요</p>
+                    </div>
+                  </div>
+                  <div class="checkbox-grid single-col">
+                    <label class="check-card">
+                      <input type="checkbox" name="medicalSupport" value="의료 지원 신청" />
+                      <span class="check-box-ui"></span>
+                      <span class="check-label">
+                        <strong>의료 지원 신청</strong>
+                        <small>진료 상담, 의료 통역 연계 및 의료 복지 지원 희망</small>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 3. 법률 상담 -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">⚖️</span>
+                    <div>
+                      <h3>3. 법률 상담</h3>
+                      <p>법률 상담 또는 심리 상담 중 필요한 항목을 체크해 주세요 (중복 체크 가능)</p>
+                    </div>
+                  </div>
+                  <div class="checkbox-grid two-col">
+                    <label class="check-card">
+                      <input type="checkbox" name="legalCounsel" value="법률 상담" />
+                      <span class="check-box-ui"></span>
+                      <span class="check-label">
+                        <strong>법률 상담</strong>
+                        <small>체류, 노무, 임금, 가족관계 등 법률 자문</small>
+                      </span>
+                    </label>
+                    <label class="check-card">
+                      <input type="checkbox" name="legalCounsel" value="심리 상담" />
+                      <span class="check-box-ui"></span>
+                      <span class="check-label">
+                        <strong>심리 상담</strong>
+                        <small>정서 지원, 스트레스 완화 및 가족 심리 상담</small>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 4. 기타 (직접 입력) -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">✨</span>
+                    <div>
+                      <h3>4. 기타 복지 서비스 (직접 입력)</h3>
+                      <p>위 항목 외에 추가로 필요한 지원이 있다면 체크 후 내용을 직접 입력해 주세요</p>
+                    </div>
+                  </div>
+                  <div class="other-service-wrap">
+                    <label class="check-card">
+                      <input type="checkbox" id="otherServiceCheck" name="otherServiceCheck" value="기타" />
+                      <span class="check-box-ui"></span>
+                      <span class="check-label">
+                        <strong>기타 서비스 신청 (직접 입력)</strong>
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      id="otherServiceInput"
+                      name="otherServiceInput"
+                      class="text-input mt-12"
+                      placeholder="예: 자녀 학습 멘토링, 긴급 생계 지원, 통번역 동행 서비스 등 직접 입력"
+                    />
+                  </div>
+                </div>
+
+                <!-- 5. 희망 날짜 및 부탁하고 싶은 말 (직접 입력) -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">📅</span>
+                    <div>
+                      <h3>5. 희망 날짜 및 부탁하고 싶은 말</h3>
+                      <p>서비스를 희망하시는 날짜(또는 요일/시간대)와 담당자에게 전하고 싶은 말씀을 입력해 주세요</p>
+                    </div>
+                  </div>
+                  <div class="form-row two-col">
+                    <div class="field-wrap">
+                      <label for="preferredDate" class="field-label">희망 날짜 (직접 입력) <span class="req">*</span></label>
+                      <input
+                        type="text"
+                        id="preferredDate"
+                        name="preferredDate"
+                        class="text-input"
+                        placeholder="예: 2026년 11월 15일 오후 2시 / 매주 토요일 오전"
+                        required
+                      />
+                    </div>
+                    <div class="field-wrap">
+                      <label for="preferredDatePicker" class="field-label">달력에서 날짜 빠른 선택 (선택사항)</label>
+                      <input
+                        type="date"
+                        id="preferredDatePicker"
+                        class="text-input"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="field-wrap mt-16">
+                    <label for="requestMessage" class="field-label">부탁하고 싶은 말 (직접 입력)</label>
+                    <textarea
+                      id="requestMessage"
+                      name="requestMessage"
+                      rows="4"
+                      class="textarea-input"
+                      placeholder="통역이 필요한 언어, 현재 겪고 계신 어려움, 연락 가능한 시간대 등 부탁하고 싶은 말을 자유롭게 적어주세요."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="form-submit-row">
+                  <button type="submit" class="btn btn-primary btn-lg btn-full">복지 서비스 신청서 제출하기</button>
+                </div>
+              </form>
+
+              <!-- 내 신청 내역 확인 -->
+              <div class="my-applications-box" id="myApplicationsBox">
+                <h4 class="sub-box-title">📋 나의 서비스 신청 내역</h4>
+                <div id="myApplicationsList" class="my-app-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. [관리자 메뉴] 윈도 화면 (관리자에게만 공개: admin / 1234) -->
+          <section id="window-admin" class="window-pane hidden" role="tabpanel">
+            <div class="section-header">
+              <span class="pill-tag admin-pill">관리자 메뉴 (관리자 전용 윈도)</span>
+              <h2 class="section-title">통합 관리자 대시보드</h2>
+              <p class="section-desc">회원 가입 작성 내용과 서비스 신청 내역을 하위메뉴별로 조회하고 MS WORD(.doc) 파일로 내려받을 수 있습니다.</p>
+            </div>
+
+            <!-- 비관리자 잠금 화면 -->
+            <div id="adminLockedView" class="locked-card admin-locked">
+              <div class="locked-icon">🛡️</div>
+              <h3>관리자에게만 공개되는 메뉴입니다</h3>
+              <p>회원 명부 조회, 서비스 신청서 열람 및 WORD 파일 다운로드 기능은 관리자 로그인 후 이용 가능합니다.</p>
+              <div class="locked-actions">
+                <button type="button" class="btn btn-primary" data-open-login="admin">관리자 로그인 (admin)</button>
+              </div>
+            </div>
+
+            <!-- 관리자 로그인 완료 시 화면 -->
+            <div id="adminAuthorizedView" class="card admin-dashboard hidden">
+              <!-- 상단 요약 및 하위메뉴 탭 -->
+              <div class="admin-top-bar">
+                <div class="admin-submenus" role="tablist" aria-label="관리자 하위메뉴">
+                  <button
+                    type="button"
+                    class="submenu-tab active"
+                    id="tabMembersBtn"
+                    data-admin-tab="members"
+                    role="tab"
+                    aria-selected="true"
+                  >
+                    👤 하위메뉴 1: 회원 가입 작성 내용
+                    <span class="count-pill" id="memberCountBadge">0</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="submenu-tab"
+                    id="tabApplicationsBtn"
+                    data-admin-tab="applications"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    📝 하위메뉴 2: 서비스 신청 내용
+                    <span class="count-pill" id="applicationCountBadge">0</span>
+                  </button>
+                </div>
+
+                <div class="admin-global-actions">
+                  <button type="button" id="openFirebaseModalBtn" class="btn btn-outline btn-sm">⚙️ Firebase 연동 설정</button>
+                </div>
+              </div>
+
+              <!-- 하위메뉴 1: 회원 가입할 때 작성한 내용 -->
+              <div id="adminMembersPane" class="admin-pane">
+                <div class="pane-header">
+                  <div>
+                    <h3>회원 가입 작성 내용 목록</h3>
+                    <p>가입 회원의 인적사항, 사용 언어(복수), 국적, 한국어 능력, 체류자격, 종교, 연락처, 거주 지역, 나이, 직업, 동거가족 정보를 확인합니다.</p>
+                  </div>
+                  <div class="pane-actions">
+                    <input type="search" id="memberSearchInput" class="search-input" placeholder="이름, 아이디, 국적, 언어, 거주지역 검색..." />
+                    <button type="button" id="downloadAllMembersWordBtn" class="btn btn-word">
+                      📄 전체 회원 명부 WORD 다운로드 (.doc)
+                    </button>
+                  </div>
+                </div>
+
+                <div id="membersTableContainer" class="admin-cards-list"></div>
+              </div>
+
+              <!-- 하위메뉴 2: 서비스 신청한 내용 -->
+              <div id="adminApplicationsPane" class="admin-pane hidden">
+                <div class="pane-header">
+                  <div>
+                    <h3>복지 서비스 신청 내용 목록</h3>
+                    <p>회원이 신청한 한국어 교육, 의료 지원, 법률·심리 상담, 기타 요청사항, 희망 날짜 및 부탁의 말을 확인합니다.</p>
+                  </div>
+                  <div class="pane-actions">
+                    <input type="search" id="appSearchInput" class="search-input" placeholder="신청자명, 서비스 항목, 희망날짜 검색..." />
+                    <button type="button" id="downloadAllAppsWordBtn" class="btn btn-word">
+                      📄 전체 서비스 신청내역 WORD 다운로드 (.doc)
+                    </button>
+                  </div>
+                </div>
+
+                <div id="applicationsTableContainer" class="admin-cards-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. [회원가입] 윈도 화면 -->
+          <section id="window-register" class="window-pane hidden" role="tabpanel">
+            <div class="section-header">
+              <span class="pill-tag">회원가입 윈도</span>
+              <h2 class="section-title">다문화 복지 서비스 회원가입</h2>
+              <p class="section-desc">맞춤형 복지 지원을 위해 아래 항목을 작성해 주세요. 가입 즉시 [서비스 신청] 창으로 전환되어 바로 이용하실 수 있습니다.</p>
+            </div>
+
+            <div class="card form-card">
+              <div class="register-info-banner">
+                <div>
+                  <strong>📌 계정 안내:</strong>
+                  <span>일반 회원은 비밀번호를 <strong>숫자 8자리</strong>로 설정해 주세요. (관리자 계정은 아이디 <code>admin</code> / 비밀번호 <code>1234</code>로 기본 설정되어 있습니다.)</span>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" data-open-login="member">이미 계정이 있으신가요? 로그인</button>
+              </div>
+
+              <form id="registerForm" novalidate>
+                <!-- 기본 계정 정보 -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">🔑</span>
+                    <div>
+                      <h3>기본 계정 정보</h3>
+                      <p>로그인에 사용할 아이디, 이름, 그리고 숫자 8자리 비밀번호를 입력해 주세요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-row three-col">
+                    <div class="field-wrap">
+                      <label for="regId" class="field-label">아이디 <span class="req">*</span></label>
+                      <input type="text" id="regId" name="userId" class="text-input" placeholder="사용할 아이디 입력 (예: user01)" required />
+                    </div>
+                    <div class="field-wrap">
+                      <label for="regName" class="field-label">이름 <span class="req">*</span></label>
+                      <input type="text" id="regName" name="userName" class="text-input" placeholder="성명 입력" required />
+                    </div>
+                    <div class="field-wrap">
+                      <label for="regPassword" class="field-label">비밀번호 (숫자 8자리) <span class="req">*</span></label>
+                      <input
+                        type="password"
+                        id="regPassword"
+                        name="password"
+                        class="text-input"
+                        placeholder="숫자 8자리 입력 (예: 12345678)"
+                        maxlength="8"
+                        inputmode="numeric"
+                        pattern="\d{8}"
+                        required
+                      />
+                      <small id="pwHelpText" class="field-hint">반드시 숫자 8자리로 입력해 주세요 (0~9 숫자 8개).</small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 상세 인적 사항: 1. 사용하는 언어(복수 체크 + 기타 직접 입력), 2. 국적, 3. 한국어 사용 가능 여부 -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">🌏</span>
+                    <div>
+                      <h3>사용 언어 · 국적 · 한국어 구사 능력</h3>
+                      <p>통번역 지원 및 수준별 교육을 위해 정확히 선택·작성해 주세요.</p>
+                    </div>
+                  </div>
+
+                  <!-- 1. 사용하는 언어 (복수 체크 가능 + 기타 직접 입력) -->
+                  <div class="field-wrap">
+                    <label class="field-label">1. 사용하는 언어 (복수 체크 가능) <span class="req">*</span></label>
+                    <div class="checkbox-grid four-col">
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="영어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>영어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="중국어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>중국어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="일본어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>일본어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="몽골어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>몽골어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="러시아어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>러시아어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="인도네시아어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>인도네시아어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="네팔어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>네팔어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="미얀마어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>미얀마어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="캄보디아어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>캄보디아어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="필리핀어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>필리핀어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="베트남어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>베트남어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="language" value="우즈베키스탄어" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>우즈베키스탄어</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" id="languageOtherCheck" name="language" value="기타" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>기타 (직접 입력)</strong></span>
+                      </label>
+                    </div>
+                    <input
+                      type="text"
+                      id="languageOtherInput"
+                      class="text-input mt-12"
+                      placeholder="기타 사용 언어가 있다면 직접 입력해 주세요 (예: 태국어, 스페인어, 아랍어 등)"
+                    />
+                  </div>
+
+                  <!-- 2. 국적 -->
+                  <div class="field-wrap mt-16">
+                    <label for="regNationality" class="field-label">2. 국적 <span class="req">*</span></label>
+                    <input type="text" id="regNationality" name="nationality" class="text-input" placeholder="예: 베트남, 필리핀, 중국, 우즈베키스탄, 네팔, 한국 등" required />
+                  </div>
+
+                  <!-- 3. 한국어 사용 가능 여부 -->
+                  <div class="field-wrap mt-16">
+                    <label class="field-label">3. 한국어 사용 가능 여부 (체크) <span class="req">*</span></label>
+                    <div class="checkbox-grid four-col">
+                      <label class="check-card">
+                        <input type="checkbox" name="koreanLevel" value="익숙함" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>익숙함</strong><small>일상 및 행정 소통 원활</small></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="koreanLevel" value="보통" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>보통</strong><small>기본적인 일상 대화 가능</small></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="koreanLevel" value="잘 못함" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>잘 못함</strong><small>간단한 단어 위주 의사소통</small></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="koreanLevel" value="전혀 못함" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>전혀 못함</strong><small>통역 및 기초 교육 필요</small></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 체류자격 및 종교 -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">🪪</span>
+                    <div>
+                      <h3>체류자격 및 종교</h3>
+                      <p>체류자격이 해당 없는 경우 ‘미등록’ 또는 ‘체류자격 상실’을 체크해 주세요.</p>
+                    </div>
+                  </div>
+
+                  <div class="field-wrap">
+                    <label for="regVisaText" class="field-label">4. 체류자격 <span class="req">*</span></label>
+                    <div class="visa-input-group">
+                      <input
+                        type="text"
+                        id="regVisaText"
+                        name="visaText"
+                        class="text-input"
+                        placeholder="소지하신 비자/체류자격 입력 (예: F-6 결혼이민, E-9 비전문취업, F-2, 귀화 등)"
+                      />
+                      <div class="visa-special-checks">
+                        <span class="visa-helper-label">해당 없는 경우 체크:</span>
+                        <label class="check-card compact-check">
+                          <input type="checkbox" name="visaStatusCheck" value="미등록" />
+                          <span class="check-box-ui"></span>
+                          <span class="check-label"><strong>미등록</strong></span>
+                        </label>
+                        <label class="check-card compact-check">
+                          <input type="checkbox" name="visaStatusCheck" value="체류자격 상실" />
+                          <span class="check-box-ui"></span>
+                          <span class="check-label"><strong>체류자격 상실</strong></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="field-wrap mt-16">
+                    <label class="field-label">5. 종교 (체크) <span class="req">*</span></label>
+                    <div class="checkbox-grid six-col">
+                      <label class="check-card">
+                        <input type="checkbox" name="religion" value="기독교" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>기독교</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="religion" value="천주교" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>천주교</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="religion" value="불교" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>불교</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="religion" value="힌두교" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>힌두교</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="religion" value="이슬람교" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>이슬람교</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" id="religionOtherCheck" name="religion" value="기타" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>기타</strong></span>
+                      </label>
+                    </div>
+                    <input
+                      type="text"
+                      id="religionOtherInput"
+                      class="text-input mt-12 hidden"
+                      placeholder="기타 종교 또는 무교 등 상세 내용을 입력해 주세요"
+                    />
+                  </div>
+                </div>
+
+                <!-- 연락처, 거주 지역(부산/김해/양산/기타), 나이, 직업, 가족(동거인) -->
+                <div class="form-group-box">
+                  <div class="group-header">
+                    <span class="group-icon">🏠</span>
+                    <div>
+                      <h3>연락처 · 거주 지역 · 가족 사항</h3>
+                      <p>복지 서비스 연계 및 상담 연락을 위한 기본 정보를 입력해 주세요.</p>
+                    </div>
+                  </div>
+
+                  <div class="form-row three-col">
+                    <div class="field-wrap">
+                      <label for="regPhone" class="field-label">6. 연락처 <span class="req">*</span></label>
+                      <input type="tel" id="regPhone" name="phone" class="text-input" placeholder="예: 010-1234-5678" required />
+                    </div>
+                    <div class="field-wrap">
+                      <label for="regAge" class="field-label">8. 나이 <span class="req">*</span></label>
+                      <input type="text" id="regAge" name="age" class="text-input" placeholder="예: 32세 (또는 출생연도)" required />
+                    </div>
+                    <div class="field-wrap">
+                      <label for="regJob" class="field-label">9. 직업 <span class="req">*</span></label>
+                      <input type="text" id="regJob" name="job" class="text-input" placeholder="예: 제조업, 주부, 유학생, 구직중 등" required />
+                    </div>
+                  </div>
+
+                  <!-- 7. 거주 지역 (부산, 김해, 양산 체크 + 기타 직접 입력) -->
+                  <div class="field-wrap mt-16">
+                    <label class="field-label">7. 거주 지역 (체크) <span class="req">*</span></label>
+                    <div class="checkbox-grid four-col">
+                      <label class="check-card">
+                        <input type="checkbox" name="region" value="부산" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>부산</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="region" value="김해" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>김해</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" name="region" value="양산" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>양산</strong></span>
+                      </label>
+                      <label class="check-card">
+                        <input type="checkbox" id="regionOtherCheck" name="region" value="기타" />
+                        <span class="check-box-ui"></span>
+                        <span class="check-label"><strong>기타 (직접 입력)</strong></span>
+                      </label>
+                    </div>
+                    <input
+                      type="text"
+                      id="regionOtherInput"
+                      class="text-input mt-12"
+                      placeholder="기타 거주 지역이거나 상세 지역명을 직접 입력해 주세요 (예: 창원, 울산, 서울 등)"
+                    />
+                  </div>
+
+                  <div class="field-wrap mt-16">
+                    <label for="regFamily" class="field-label">10. 가족 (동거인) <span class="req">*</span></label>
+                    <input
+                      type="text"
+                      id="regFamily"
+                      name="family"
+                      class="text-input"
+                      placeholder="예: 배우자, 자녀 2명 (총 4명 동거) / 1인 가구(동거인 없음)"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-submit-row">
+                  <button type="submit" class="btn btn-primary btn-lg btn-full">회원가입 완료 및 자동 로그인</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>다문화 복지 브릿지 (Multicultural Welfare Service App)</strong>
+        <p>다문화 가족 및 외국인 주민을 위한 맞춤형 한국어 교육 · 의료 · 법률 · 심리 복지 지원 플랫폼</p>
+      </div>
+      <div class="footer-links">
+        <button type="button" class="footer-nav-btn" data-window-target="about">사이트 안내</button>
+        <button type="button" class="footer-nav-btn" data-window-target="apply">서비스 신청</button>
+        <button type="button" class="footer-nav-btn" data-window-target="admin">관리자 메뉴</button>
+        <button type="button" class="footer-nav-btn" data-window-target="register">회원가입</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 로그인 모달 -->
+  <div id="loginModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="loginModalTitle">로그인</h3>
+        <button type="button" id="closeLoginModalBtn" class="modal-close-btn" aria-label="닫기">&times;</button>
+      </div>
+      <form id="loginForm" novalidate>
+        <div class="field-wrap">
+          <label for="loginId" class="field-label">아이디</label>
+          <input type="text" id="loginId" class="text-input" placeholder="회원 아이디 또는 관리자(admin)" required />
+        </div>
+        <div class="field-wrap mt-12">
+          <label for="loginPw" class="field-label">비밀번호</label>
+          <input type="password" id="loginPw" class="text-input" placeholder="회원(숫자 8자리) 또는 관리자(1234)" required />
+        </div>
+        <div class="login-helper-box mt-12">
+          <span>💡 <strong>관리자 계정:</strong> 아이디 <code>admin</code> / 비밀번호 <code>1234</code></span>
+          <button type="button" id="fillAdminCredentialsBtn" class="btn-link">관리자 정보 자동입력</button>
+        </div>
+        <div class="modal-actions mt-16">
+          <button type="submit" class="btn btn-primary btn-full">로그인하기</button>
+        </div>
+      </form>
+      <div class="modal-footer-note">
+        <span>아직 계정이 없으신가요?</span>
+        <button type="button" id="goToRegisterFromModal" class="btn-link">회원가입 창 열기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase 설정 모달 -->
+  <div id="firebaseModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="firebaseModalTitle">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <h3 id="firebaseModalTitle">🔥 Firebase 실시간 데이터베이스 연동 설정</h3>
+        <button type="button" id="closeFirebaseModalBtn" class="modal-close-btn" aria-label="닫기">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          <code>firebase-config.js</code> 파일에 설정값을 넣거나, 아래에 Firebase 웹 앱 구성(JSON)을 붙여넣으면 즉시 클라우드 Firestore와 연동됩니다. (미설정 시에도 브라우저 로컬 저장소에 안전하게 자동 저장됩니다.)
+        </p>
+        <div class="field-wrap mt-12">
+          <label for="firebaseConfigJsonInput" class="field-label">Firebase Config JSON (선택)</label>
+          <textarea
+            id="firebaseConfigJsonInput"
+            rows="7"
+            class="textarea-input code-textarea"
+            placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "your-project.firebaseapp.com",
+  "projectId": "your-project",
+  "storageBucket": "your-project.appspot.com",
+  "messagingSenderId": "123456789",
+  "appId": "1:123456789:web:abcdef"
+}'
+          ></textarea>
+        </div>
+        <div class="modal-actions mt-16">
+          <button type="button" id="saveFirebaseConfigBtn" class="btn btn-primary">연동 설정 저장 및 재연결</button>
+          <button type="button" id="clearFirebaseConfigBtn" class="btn btn-outline">로컬 전용 모드로 초기화</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- 스크립트 로드 (로컬 더블클릭 실행 및 Vercel/서버 환경 모두 호환) -->
+  <script src="./firebase-config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

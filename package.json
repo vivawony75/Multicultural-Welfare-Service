@@ -1,0 +1,10 @@
+{
+  "name": "multicultural-welfare-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "다문화 대상자 맞춤형 복지 서비스 신청 웹 앱 (GitHub + Vercel + Firebase)",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve ."
+  }
+}
