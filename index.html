@@ -7,13 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=3" />
 </head>
 <body>
   <!-- 상단 고정 네비게이션 바 (윈도형 화면 전환 구성) -->
   <header class="site-header" id="top">
     <div class="container header-inner">
-      <button type="button" class="brand-logo" data-window-target="about">
+      <button type="button" class="brand-logo" data-window-target="about" onclick="window.switchWindow && window.switchWindow('about')">
         <span class="brand-emblem">🤝</span>
         <div class="brand-text">
           <span class="brand-title">다문화 복지 브릿지</span>
@@ -23,18 +23,18 @@
 
       <!-- 상단 핵심 메뉴: [사이트 안내], [서비스 신청], [관리자 메뉴], [회원가입] -->
       <nav class="main-nav" aria-label="주요 메뉴">
-        <button type="button" class="nav-link active" data-window-target="about">
+        <button type="button" id="navBtnAbout" class="nav-link active" data-window-target="about" onclick="window.switchWindow && window.switchWindow('about')">
           사이트 안내
         </button>
-        <button type="button" class="nav-link" data-window-target="apply">
+        <button type="button" id="navBtnApply" class="nav-link" data-window-target="apply" onclick="window.switchWindow && window.switchWindow('apply')">
           서비스 신청
           <span class="nav-badge" id="navApplyBadge">회원전용</span>
         </button>
-        <button type="button" class="nav-link" data-window-target="admin">
+        <button type="button" id="navBtnAdmin" class="nav-link" data-window-target="admin" onclick="window.switchWindow && window.switchWindow('admin')">
           관리자 메뉴
           <span class="nav-badge admin-badge" id="navAdminBadge">관리자</span>
         </button>
-        <button type="button" class="nav-link" data-window-target="register">
+        <button type="button" id="navBtnRegister" class="nav-link" data-window-target="register" onclick="window.switchWindow && window.switchWindow('register')">
           회원가입
         </button>
       </nav>
@@ -46,7 +46,7 @@
           <span id="currentUserText" class="user-name">게스트</span>
           <button type="button" id="logoutBtn" class="btn btn-outline btn-sm">로그아웃</button>
         </div>
-        <button type="button" id="openLoginModalBtn" class="btn btn-primary btn-sm">로그인</button>
+        <button type="button" id="openLoginModalBtn" class="btn btn-primary btn-sm" onclick="window.openLoginModal && window.openLoginModal('member')">로그인</button>
       </div>
     </div>
   </header>
@@ -89,9 +89,9 @@
                 </div>
 
                 <div class="hero-actions">
-                  <button type="button" class="btn btn-primary btn-lg" data-window-target="register">회원가입 창 열기</button>
-                  <button type="button" class="btn btn-secondary btn-lg" data-window-target="apply">서비스 신청 창 열기</button>
-                  <button type="button" id="quickLoginHeroBtn" class="btn btn-ghost btn-lg">기존 회원 / 관리자 로그인</button>
+                  <button type="button" class="btn btn-primary btn-lg" data-window-target="register" onclick="window.switchWindow && window.switchWindow('register')">회원가입 창 열기</button>
+                  <button type="button" class="btn btn-secondary btn-lg" data-window-target="apply" onclick="window.switchWindow && window.switchWindow('apply')">서비스 신청 창 열기</button>
+                  <button type="button" id="quickLoginHeroBtn" class="btn btn-ghost btn-lg" onclick="window.openLoginModal && window.openLoginModal('member')">기존 회원 / 관리자 로그인</button>
                 </div>
               </div>
 
@@ -155,8 +155,8 @@
               <h3>회원 가입한 분들에게만 공개되는 메뉴입니다</h3>
               <p>복지 서비스 신청은 회원가입 및 로그인 후 이용하실 수 있습니다.<br/>아직 회원이 아니시라면 회원가입 메뉴에서 간편하게 가입해 주세요.</p>
               <div class="locked-actions">
-                <button type="button" class="btn btn-primary" data-open-login="member">로그인하기</button>
-                <button type="button" class="btn btn-outline" data-window-target="register">회원가입 창으로 이동</button>
+                <button type="button" class="btn btn-primary" data-open-login="member" onclick="window.openLoginModal && window.openLoginModal('member')">로그인하기</button>
+                <button type="button" class="btn btn-outline" data-window-target="register" onclick="window.switchWindow && window.switchWindow('register')">회원가입 창으로 이동</button>
               </div>
             </div>
 
@@ -355,7 +355,7 @@
               <h3>관리자에게만 공개되는 메뉴입니다</h3>
               <p>회원 명부 조회, 서비스 신청서 열람 및 WORD 파일 다운로드 기능은 관리자 로그인 후 이용 가능합니다.</p>
               <div class="locked-actions">
-                <button type="button" class="btn btn-primary" data-open-login="admin">관리자 로그인 (admin)</button>
+                <button type="button" class="btn btn-primary" data-open-login="admin" onclick="window.openLoginModal && window.openLoginModal('admin')">관리자 로그인 (admin)</button>
               </div>
             </div>
 
@@ -445,7 +445,7 @@
                   <strong>📌 계정 안내:</strong>
                   <span>일반 회원은 비밀번호를 <strong>숫자 8자리</strong>로 설정해 주세요. (관리자 계정은 아이디 <code>admin</code> / 비밀번호 <code>1234</code>로 기본 설정되어 있습니다.)</span>
                 </div>
-                <button type="button" class="btn btn-outline btn-sm" data-open-login="member">이미 계정이 있으신가요? 로그인</button>
+                <button type="button" class="btn btn-outline btn-sm" data-open-login="member" onclick="window.openLoginModal && window.openLoginModal('member')">이미 계정이 있으신가요? 로그인</button>
               </div>
 
               <form id="registerForm" novalidate>
@@ -778,10 +778,10 @@
         <p>다문화 가족 및 외국인 주민을 위한 맞춤형 한국어 교육 · 의료 · 법률 · 심리 복지 지원 플랫폼</p>
       </div>
       <div class="footer-links">
-        <button type="button" class="footer-nav-btn" data-window-target="about">사이트 안내</button>
-        <button type="button" class="footer-nav-btn" data-window-target="apply">서비스 신청</button>
-        <button type="button" class="footer-nav-btn" data-window-target="admin">관리자 메뉴</button>
-        <button type="button" class="footer-nav-btn" data-window-target="register">회원가입</button>
+        <button type="button" class="footer-nav-btn" data-window-target="about" onclick="window.switchWindow && window.switchWindow('about')">사이트 안내</button>
+        <button type="button" class="footer-nav-btn" data-window-target="apply" onclick="window.switchWindow && window.switchWindow('apply')">서비스 신청</button>
+        <button type="button" class="footer-nav-btn" data-window-target="admin" onclick="window.switchWindow && window.switchWindow('admin')">관리자 메뉴</button>
+        <button type="button" class="footer-nav-btn" data-window-target="register" onclick="window.switchWindow && window.switchWindow('register')">회원가입</button>
       </div>
     </div>
   </footer>
@@ -791,7 +791,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="loginModalTitle">로그인</h3>
-        <button type="button" id="closeLoginModalBtn" class="modal-close-btn" aria-label="닫기">&times;</button>
+        <button type="button" id="closeLoginModalBtn" class="modal-close-btn" aria-label="닫기" onclick="window.closeLoginModal && window.closeLoginModal()">&times;</button>
       </div>
       <form id="loginForm" novalidate>
         <div class="field-wrap">
@@ -856,7 +856,7 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- 스크립트 로드 (로컬 더블클릭 실행 및 Vercel/서버 환경 모두 호환) -->
-  <script src="./firebase-config.js"></script>
-  <script src="./app.js"></script>
+  <script src="./firebase-config.js?v=3"></script>
+  <script src="./app.js?v=3"></script>
 </body>
 </html>

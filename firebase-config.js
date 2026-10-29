@@ -1,10 +1,5 @@
 /**
- * Firebase 연동 설정 및 데이터 동기화 모듈 (Firestore + LocalStorage 하이브리드 지원)
- *
- * [사용 방법]
- * 1. Firebase 콘솔(https://console.firebase.google.com)에서 프로젝트 생성 후 웹 앱을 등록합니다.
- * 2. 아래 DEFAULT_FIREBASE_CONFIG 객체에 본인의 Firebase 설정값을 입력하거나,
- *    웹 앱 내 [관리자 메뉴 -> Firebase 연동 설정] 버튼에서 JSON을 붙여넣으면 즉시 클라우드와 연동됩니다.
+ * Firebase 연동 설정 및 데이터 동기화 모듈 (Firestore + LocalStorage + 메모리 안전 폴백 지원)
  */
 
 const DEFAULT_FIREBASE_CONFIG = {
@@ -22,13 +17,44 @@ const STORAGE_KEYS = {
   APPLICATIONS: "welfare_applications_v2"
 };
 
+// 브라우저의 file:// 보안 정책 등으로 localStorage 접근이 차단된 경우를 대비한 메모리 저장소 폴백
+const memoryStore = {};
+
+function safeGetItem(key) {
+  try {
+    const val = window.localStorage.getItem(key);
+    if (val !== null) return val;
+  } catch (e) {
+    // localStorage 차단 환경 폴백
+  }
+  return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
+}
+
+function safeSetItem(key, value) {
+  memoryStore[key] = String(value);
+  try {
+    window.localStorage.setItem(key, String(value));
+  } catch (e) {
+    // localStorage 차단 환경 폴백
+  }
+}
+
+function safeRemoveItem(key) {
+  delete memoryStore[key];
+  try {
+    window.localStorage.removeItem(key);
+  } catch (e) {
+    // localStorage 차단 환경 폴백
+  }
+}
+
 let firestoreDb = null;
 let firestoreMod = null;
 let isFirebaseConnected = false;
 
 function getStoredFirebaseConfig() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEYS.FIREBASE_CFG);
+    const saved = safeGetItem(STORAGE_KEYS.FIREBASE_CFG);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed && parsed.apiKey && parsed.projectId) {
@@ -45,6 +71,7 @@ function getStoredFirebaseConfig() {
 }
 
 async function initDatabase() {
+  ensureInitialLocalData();
   const cfg = getStoredFirebaseConfig();
   if (!cfg) {
     isFirebaseConnected = false;
@@ -73,16 +100,16 @@ function getConnectionStatus() {
 }
 
 function saveCustomFirebaseConfig(configObj) {
-  localStorage.setItem(STORAGE_KEYS.FIREBASE_CFG, JSON.stringify(configObj));
+  safeSetItem(STORAGE_KEYS.FIREBASE_CFG, JSON.stringify(configObj));
 }
 
 function clearCustomFirebaseConfig() {
-  localStorage.removeItem(STORAGE_KEYS.FIREBASE_CFG);
+  safeRemoveItem(STORAGE_KEYS.FIREBASE_CFG);
 }
 
-// 로컬 기본 샘플 데이터 초기화 (처음 실행 시 관리자 화면 확인용 예시 1건 제공)
+// 로컬 기본 샘플 데이터 초기화
 function ensureInitialLocalData() {
-  const existingMembers = localStorage.getItem(STORAGE_KEYS.MEMBERS);
+  const existingMembers = safeGetItem(STORAGE_KEYS.MEMBERS);
   if (!existingMembers) {
     const sampleMembers = [
       {
@@ -103,10 +130,10 @@ function ensureInitialLocalData() {
         createdAt: "2026-10-29 14:20:00"
       }
     ];
-    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(sampleMembers));
+    safeSetItem(STORAGE_KEYS.MEMBERS, JSON.stringify(sampleMembers));
   }
 
-  const existingApps = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
+  const existingApps = safeGetItem(STORAGE_KEYS.APPLICATIONS);
   if (!existingApps) {
     const sampleApps = [
       {
@@ -126,13 +153,18 @@ function ensureInitialLocalData() {
         createdAt: "2026-10-29 14:35:00"
       }
     ];
-    localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(sampleApps));
+    safeSetItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(sampleApps));
   }
 }
 
 async function fetchAllMembers() {
   ensureInitialLocalData();
-  const localList = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS) || "[]");
+  let localList = [];
+  try {
+    localList = JSON.parse(safeGetItem(STORAGE_KEYS.MEMBERS) || "[]");
+  } catch (e) {
+    localList = [];
+  }
 
   if (isFirebaseConnected && firestoreDb && firestoreMod) {
     try {
@@ -143,7 +175,7 @@ async function fetchAllMembers() {
       });
       if (remoteList.length > 0) {
         remoteList.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
-        localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(remoteList));
+        safeSetItem(STORAGE_KEYS.MEMBERS, JSON.stringify(remoteList));
         return remoteList;
       }
     } catch (err) {
@@ -156,7 +188,7 @@ async function fetchAllMembers() {
 async function saveMemberRecord(memberObj) {
   const list = await fetchAllMembers();
   const updated = [memberObj, ...list];
-  localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(updated));
+  safeSetItem(STORAGE_KEYS.MEMBERS, JSON.stringify(updated));
 
   if (isFirebaseConnected && firestoreDb && firestoreMod) {
     try {
@@ -173,7 +205,12 @@ async function saveMemberRecord(memberObj) {
 
 async function fetchAllApplications() {
   ensureInitialLocalData();
-  const localList = JSON.parse(localStorage.getItem(STORAGE_KEYS.APPLICATIONS) || "[]");
+  let localList = [];
+  try {
+    localList = JSON.parse(safeGetItem(STORAGE_KEYS.APPLICATIONS) || "[]");
+  } catch (e) {
+    localList = [];
+  }
 
   if (isFirebaseConnected && firestoreDb && firestoreMod) {
     try {
@@ -184,7 +221,7 @@ async function fetchAllApplications() {
       });
       if (remoteList.length > 0) {
         remoteList.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
-        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(remoteList));
+        safeSetItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(remoteList));
         return remoteList;
       }
     } catch (err) {
@@ -197,7 +234,7 @@ async function fetchAllApplications() {
 async function saveApplicationRecord(appObj) {
   const list = await fetchAllApplications();
   const updated = [appObj, ...list];
-  localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+  safeSetItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
 
   if (isFirebaseConnected && firestoreDb && firestoreMod) {
     try {
@@ -222,5 +259,8 @@ window.WelfareDB = {
   fetchAllMembers,
   saveMemberRecord,
   fetchAllApplications,
-  saveApplicationRecord
+  saveApplicationRecord,
+  safeGetItem,
+  safeSetItem,
+  safeRemoveItem
 };
